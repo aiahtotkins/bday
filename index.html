@@ -59,7 +59,7 @@
                 <div class="smoke"></div>
                 <div class="wick"></div>
               </div>
-              <div class="candle" data-index="3">
+              <div class="candle" data-i  ndex="3">
                 <div class="flame"></div>
                 <div class="smoke"></div>
                 <div class="wick"></div>
@@ -179,9 +179,10 @@
 
     </section>
 
-    <!-- Footer Controls -->
+<!-- Footer Controls -->
 <footer class="footer-bar">
   <button id="music-btn" class="btn btn-soft">🎵 Play Birthday Tune</button>
+  <div id="yt-player" style="position: absolute; width: 0; height: 0; overflow: hidden;"></div>
 </footer>
   </main>
 
@@ -245,7 +246,7 @@
     const defaultData = {
       name: "Maem Mich",
       message: "Happy, happy birthday! Today is all about celebrating the wonderful, kind, and radiant person you are.\n\nMay this new chapter of your life be filled with soft mornings, endless laughter, sweet surprises, and every dream your heart has been wishing for.\n\nThank you for bringing so much warmth and light into the world just by being you. Here’s to making unforgettable memories this year!",
-      sender: "With all my love ♡"
+      sender: "juju ♡"
     };
 
     let giftData = { ...defaultData };
@@ -517,22 +518,56 @@
       setTimeout(() => toastEl.classList.remove("show"), 3000);
     }
 
-    // Soft Web Audio Music Box "Happy Birthday" Melody
-    function playBirthdayTune() {
-      if (isPlayingMusic) {
-        stopMusic();
-        return;
-      }
+    // Load YouTube IFrame API
+const tag = document.createElement("script");
+tag.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(tag);
 
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
+let ytPlayer = null;
+let isPlayerReady = false;
 
-      isPlayingMusic = true;
-      musicBtn.textContent = "⏸️ Pause Tune";
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player("yt-player", {
+    height: "0",
+    width: "0",
+    videoId: "O2aQhWwxuyY", // <-- Paste your YouTube Video ID here
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      loop: 1,
+      playlist: "O2aQhWwxuyY" // <-- Paste the same Video ID here so it loops
+    },
+    events: {
+      onReady: () => {
+        isPlayerReady = true;
+      }
+    }
+  });
+}
+
+function playBirthdayTune() {
+  if (!isPlayerReady || !ytPlayer) {
+    showToast("Song is still loading, try again in a second! 🎵");
+    return;
+  }
+  if (isPlayingMusic) {
+    stopMusic();
+    return;
+  }
+  ytPlayer.playVideo();
+  isPlayingMusic = true;
+  musicBtn.textContent = "⏸️ Pause Song";
+}
+
+function stopMusic() {
+  if (ytPlayer && isPlayerReady) {
+    ytPlayer.pauseVideo();
+  }
+  isPlayingMusic = false;
+  musicBtn.textContent = "🎵 Play Song";
+}
+
+musicBtn.addEventListener("click", playBirthdayTune);
 
       const notes = [
         [261.63, 0.35], [261.63, 0.15], [293.66, 0.5], [261.63, 0.5], [349.23, 0.5], [329.63, 0.9],
