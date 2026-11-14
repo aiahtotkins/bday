@@ -518,54 +518,27 @@
       setTimeout(() => toastEl.classList.remove("show"), 3000);
     }
 
-    // Load YouTube IFrame API
-const tag = document.createElement("script");
-tag.src = "https://www.youtube.com/iframe_api";
-document.head.appendChild(tag);
+    const bgSong = document.getElementById("bg-song");
 
-let ytPlayer = null;
-let isPlayerReady = false;
-
-function onYouTubeIframeAPIReady() {
-  ytPlayer = new YT.Player("yt-player", {
-    height: "0",
-    width: "0",
-    videoId: "O2aQhWwxuyY", // <-- Paste your YouTube Video ID here
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      loop: 1,
-      playlist: "O2aQhWwxuyY" // <-- Paste the same Video ID here so it loops
-    },
-    events: {
-      onReady: () => {
-        isPlayerReady = true;
-      }
+    function playBirthdayTune() {
+      if (isPlayingMusic) {
+      stopMusic();
+      return;
+  }
+  
+      bgSong.play().then(() => {
+        isPlayingMusic = true;
+        musicBtn.textContent = "⏸️ Pause Song";
+      }).catch((err) => {
+        showToast("Click play again to start the music! 🎵");
+      });
     }
-  });
-}
 
-function playBirthdayTune() {
-  if (!isPlayerReady || !ytPlayer) {
-    showToast("Song is still loading, try again in a second! 🎵");
-    return;
-  }
-  if (isPlayingMusic) {
-    stopMusic();
-    return;
-  }
-  ytPlayer.playVideo();
-  isPlayingMusic = true;
-  musicBtn.textContent = "⏸️ Pause Song";
-}
-
-function stopMusic() {
-  if (ytPlayer && isPlayerReady) {
-    ytPlayer.pauseVideo();
-  }
-  isPlayingMusic = false;
-  musicBtn.textContent = "🎵 Play Song";
-}
+    function stopMusic() {
+      bgSong.pause();
+      isPlayingMusic = false;
+      musicBtn.textContent = "🎵 Play Song";
+    }
 
 musicBtn.addEventListener("click", playBirthdayTune);
 
@@ -601,7 +574,7 @@ musicBtn.addEventListener("click", playBirthdayTune);
       musicTimeout = setTimeout(() => {
         stopMusic();
       }, totalDuration * 1000);
-    }
+      
 
     function stopMusic() {
       isPlayingMusic = false;
